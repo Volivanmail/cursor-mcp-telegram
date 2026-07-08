@@ -18,6 +18,7 @@ from states import TaskForm
 logging.basicConfig(level=logging.INFO, stream=sys.stdout)
 
 TOKEN = getenv("BOT_TOKEN")
+DASHBOARD_URL = getenv("DASHBOARD_URL", "http://localhost:8000/dashboard")
 dp = Dispatcher()
 
 
@@ -28,7 +29,7 @@ def format_api_reply(method: str, path: str, data: dict | list) -> str:
         f"<code>{method} {path}</code>\n\n"
         "📦 <b>Ответ API:</b>\n"
         f"<pre>{body}</pre>\n\n"
-        "👀 Dashboard: http://localhost:8000/dashboard"
+        f"👀 Dashboard: {DASHBOARD_URL}"
     )
 
 
@@ -63,7 +64,7 @@ async def cmd_start(message: Message, state: FSMContext) -> None:
         "Привет! Это <b>Task Tracker</b>.\n\n"
         "Бот работает через FastAPI и сохраняет задачи в SQLite.\n"
         "Открой dashboard в браузере:\n"
-        "http://localhost:8000/dashboard\n\n"
+        f"{DASHBOARD_URL}\n\n"
         "Используй кнопки меню ниже 👇",
         parse_mode=ParseMode.HTML,
         reply_markup=main_menu(),
@@ -75,7 +76,7 @@ async def cmd_start(message: Message, state: FSMContext) -> None:
 async def cmd_help(message: Message) -> None:
     await message.answer(
         "<b>Как демонстрировать проект:</b>\n"
-        "1. Открой http://localhost:8000/dashboard\n"
+        f"1. Открой {DASHBOARD_URL}\n"
         "2. Нажми «➕ Добавить задачу»\n"
         "3. Введи текст задачи\n"
         "4. На dashboard увидишь HTTP-запрос и новую задачу\n\n"

@@ -123,6 +123,7 @@ docker compose up --build
 BOT_TOKEN=your_telegram_bot_token
 API_BASE_URL=http://api:8000
 DATABASE_PATH=/data/tasks.db
+DASHBOARD_URL=http://localhost:8000/dashboard
 ```
 
 ## Сдача ДЗ
