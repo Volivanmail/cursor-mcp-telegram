@@ -14,10 +14,8 @@
 - [Возможности](#возможности)
 - [Структура](#структура)
 - [Быстрый старт](#быстрый-старт)
-- [Демонстрация для ДЗ](#демонстрация-для-дз)
 - [Context7 MCP](#context7-mcp)
 - [Переменные окружения](#переменные-окружения)
-- [Сдача ДЗ](#сдача-дз)
 
 ## О проекте
 
@@ -91,17 +89,6 @@ docker compose up --build
 - Dashboard: [http://localhost:8000/dashboard](http://localhost:8000/dashboard)
 - Swagger: [http://localhost:8000/docs](http://localhost:8000/docs)
 
-## Демонстрация для ДЗ
-
-1. Покажи **Context7 MCP** в Cursor Settings
-2. Открой [dashboard](http://localhost:8000/dashboard) в браузере
-3. В Telegram нажми **«➕ Добавить задачу»** и введи текст
-4. На dashboard появится `POST /api/tasks` и новая задача
-5. Нажми **«📋 Мои задачи»** — бот покажет список и JSON-ответ
-6. Нажми **«✅ Готово»** — на dashboard будет `PATCH /api/tasks/{id}/toggle`
-
-**Цепочка:** Telegram → бот → HTTP → FastAPI → SQLite → dashboard
-
 ## Context7 MCP
 
 Файл `.cursor/mcp.json`:
@@ -126,8 +113,6 @@ DATABASE_PATH=/data/tasks.db
 DASHBOARD_URL=http://localhost:8000/dashboard
 ```
 
-## Сдача ДЗ
-
 ### Пример запросов к Context7
 
 ```text
@@ -135,13 +120,6 @@ DASHBOARD_URL=http://localhost:8000/dashboard
 Через Context7 покажи FSM и polling в aiogram 3
 По документации Context7 сделай Task Tracker: API + бот + dashboard
 ```
-
-### Что приложить
-
-- [ ] Скрин MCP Context7 в Cursor
-- [ ] Скрин dashboard с HTTP-логом
-- [ ] Скрин Telegram-бота с ответом API
-- [ ] Ссылка на GitHub-репозиторий
 
 ### Что взято из Context7
 
