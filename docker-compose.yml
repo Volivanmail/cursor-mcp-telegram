@@ -1,0 +1,28 @@
+services:
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile.api
+    container_name: demo_api
+    ports:
+      - "8000:8000"
+    environment:
+      DATABASE_PATH: /data/tasks.db
+    volumes:
+      - api_data:/data
+    restart: unless-stopped
+
+  bot:
+    build:
+      context: .
+      dockerfile: Dockerfile.bot
+    container_name: demo_bot
+    depends_on:
+      - api
+    environment:
+      BOT_TOKEN: ${BOT_TOKEN}
+      API_BASE_URL: ${API_BASE_URL}
+    restart: unless-stopped
+
+volumes:
+  api_data:

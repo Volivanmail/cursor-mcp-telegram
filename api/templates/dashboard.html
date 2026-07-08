@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Task Tracker Dashboard</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #0f1419;
+      --card: #1a2332;
+      --border: #2d3a4f;
+      --text: #e7ecf3;
+      --muted: #9aa7bd;
+      --accent: #3b82f6;
+      --ok: #22c55e;
+      --warn: #f59e0b;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: Inter, Segoe UI, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      padding: 24px;
+    }
+    h1 { margin: 0 0 8px; font-size: 28px; }
+    .sub { color: var(--muted); margin-bottom: 24px; }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 16px;
+    }
+    .card h3 {
+      margin: 0 0 8px;
+      font-size: 13px;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+    .value { font-size: 28px; font-weight: 700; }
+    .panels {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+    @media (max-width: 900px) {
+      .panels { grid-template-columns: 1fr; }
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14px;
+    }
+    th, td {
+      text-align: left;
+      padding: 10px 8px;
+      border-bottom: 1px solid var(--border);
+    }
+    th { color: var(--muted); font-weight: 600; }
+    .badge {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+    .badge.ok { background: rgba(34, 197, 94, 0.15); color: var(--ok); }
+    .badge.open { background: rgba(245, 158, 11, 0.15); color: var(--warn); }
+    .method {
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      color: var(--accent);
+    }
+    .footer {
+      margin-top: 16px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+    a { color: var(--accent); }
+  </style>
+</head>
+<body>
+  <h1>Task Tracker Dashboard</h1>
+  <p class="sub">Живая панель: Telegram-бот → FastAPI → SQLite. Обновление каждые 3 секунды.</p>
+
+  <div class="grid">
+    <div class="card"><h3>API</h3><div class="value" id="api-status">...</div></div>
+    <div class="card"><h3>Всего задач</h3><div class="value" id="tasks-total">0</div></div>
+    <div class="card"><h3>Выполнено</h3><div class="value" id="tasks-done">0</div></div>
+    <div class="card"><h3>Пользователей</h3><div class="value" id="users-total">0</div></div>
+  </div>
+
+  <div class="panels">
+    <div class="card">
+      <h3>Последние HTTP-запросы</h3>
+      <table>
+        <thead>
+          <tr><th>Время</th><th>Метод</th><th>Путь</th><th>Статус</th></tr>
+        </thead>
+        <tbody id="activity-body"></tbody>
+      </table>
+    </div>
+
+    <div class="card">
+      <h3>Последние задачи</h3>
+      <table>
+        <thead>
+          <tr><th>ID</th><th>Задача</th><th>Пользователь</th><th>Статус</th></tr>
+        </thead>
+        <tbody id="tasks-body"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <p class="footer">
+    Swagger: <a href="/docs" target="_blank">/docs</a> ·
+    JSON stats: <a href="/api/stats" target="_blank">/api/stats</a>
+  </p>
+
+  <script>
+    async function refresh() {
+      try {
+        const res = await fetch('/api/stats');
+        const data = await res.json();
+
+        document.getElementById('api-status').textContent = data.health.status.toUpperCase();
+        document.getElementById('tasks-total').textContent = data.stats.tasks_total;
+        document.getElementById('tasks-done').textContent = data.stats.tasks_done;
+        document.getElementById('users-total').textContent = data.stats.users_total;
+
+        const activityBody = document.getElementById('activity-body');
+        activityBody.innerHTML = (data.activity.requests || []).map(item => `
+          <tr>
+            <td>${item.time}</td>
+            <td class="method">${item.method}</td>
+            <td>${item.path}</td>
+            <td>${item.status}</td>
+          </tr>
+        `).join('') || '<tr><td colspan="4">Пока нет запросов</td></tr>';
+
+        const tasksBody = document.getElementById('tasks-body');
+        tasksBody.innerHTML = (data.tasks || []).map(task => `
+          <tr>
+            <td>#${task.id}</td>
+            <td>${task.title}</td>
+            <td>${task.user_id}</td>
+            <td><span class="badge ${task.done ? 'ok' : 'open'}">${task.done ? 'done' : 'open'}</span></td>
+          </tr>
+        `).join('') || '<tr><td colspan="4">Задач пока нет</td></tr>';
+      } catch (error) {
+        document.getElementById('api-status').textContent = 'ERROR';
+      }
+    }
+
+    refresh();
+    setInterval(refresh, 3000);
+  </script>
+</body>
+</html>
